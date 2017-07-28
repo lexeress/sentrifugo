@@ -214,11 +214,19 @@ class Default_Model_Departments extends Zend_Db_Table_Abstract
 	 return $result;
 	}
 	
-	public function checkExistance($deptname, $unitid,$id)
+	public function checkExistance($deptname, $unitid, $deptid, $id)
 	{
 		$db = Zend_Db_Table::getDefaultAdapter();
         if(!empty($id)) $where = "and id <> ".$id; else $where= '';
-		$query = "select count(*) as count from main_departments where isactive = 1 and unitid=".$unitid." and deptname = '".$deptname."' ".$where;
+//		$query = "select count(*) as count from main_departments where isactive = 1 and unitid=".$unitid." and deptname = '".$deptname."' ".$where;
+        $query = "select count(*) as count from main_departments where isactive = 1";
+        if ($unitid != '') {
+            $query .= " and unitid=".$unitid;
+        }
+        if ($deptid != '') {
+            $query .= " and deptid=".$deptid;
+        }
+        $query .= " and deptname = '".$deptname."' ".$where;
         $result = $db->query($query)->fetchAll();
 	    return $result[0]['count'];
 	}

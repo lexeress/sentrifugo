@@ -58,7 +58,7 @@
 <?php 
 $startDate = $this->form->start_date->getValue();
 sapp_Helper::viewHeader();
-sapp_Helper::viewBody('nor','Department Name',(!empty($this->data['deptname']))?$this->data['deptname']:"...",'Business Unit',(!empty($this->data['unitid']))?$this->data['unitid']:"...");
+sapp_Helper::viewBody('nor','Department Name',(!empty($this->data['deptname']))?$this->data['deptname']:"...",'Business Unit/Parent Department',(!empty($this->data['unitid']))?$this->data['unitid']:"...");
 sapp_Helper::viewBody('alt','Department code',(!empty($this->data['deptcode']))?$this->data['deptcode']:"...",'Department Head',(!empty($this->data['depthead']))?$this->data['depthead']:"...");
 sapp_Helper::viewBody('nor','Started On',(!empty($startDate))?$this->form->start_date->getValue():"...",'Time Zone',(!empty($this->data['timezone']))?$this->data['timezone']:"...");
 sapp_Helper::viewBody('alt','Country',(!empty($this->data['country']))?$this->data['country']:"...",'State',(!empty($this->data['state']))?$this->data['state']:"...");
