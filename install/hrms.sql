@@ -862,6 +862,7 @@ CREATE TABLE `main_departments` (
   `timezone` int(11) DEFAULT NULL,
   `depthead` int(11) unsigned DEFAULT NULL,
   `unitid` int(11) DEFAULT NULL,
+  `deptid` int(11) DEFAULT NULL,
   `createdby` int(11) unsigned DEFAULT NULL,
   `modifiedby` int(11) unsigned DEFAULT NULL,
   `createddate` datetime DEFAULT NULL,
