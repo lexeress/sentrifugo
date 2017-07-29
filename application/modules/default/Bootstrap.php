@@ -29,6 +29,7 @@ class Default_Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$autoloader->registerNamespace ( 'ZendX_' );		
 		$autoloader->registerNamespace ( 'Jqgrid_' );
 		$autoloader->registerNamespace ( 'sapp_' );
+		$autoloader->registerNamespace ( 'Tree_');
 		
 		$this->options = $this->getOptions();                			
     

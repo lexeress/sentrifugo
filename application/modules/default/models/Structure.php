@@ -43,7 +43,7 @@ class Default_Model_Structure extends Zend_Db_Table_Abstract
 	public function getDeptData()
 	{
 		$db = Zend_Db_Table::getDefaultAdapter();
-		$deptData = $db->query("select id,deptname,unitid from main_departments where isactive = 1 order by deptname asc;");
+		$deptData = $db->query("select id,deptname,unitid,deptid from main_departments where isactive = 1 order by deptname asc;");
 		$result= $deptData->fetchAll();
 		return $result;
 	}
