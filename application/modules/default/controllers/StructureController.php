@@ -111,6 +111,11 @@ class Default_StructureController extends Zend_Controller_Action
                     $dept = current($departmentData);
                 }
             }
+
+            $dept = next($departmentData);
+            if ($dept == false) {
+                $dept = reset($departmentData);
+            }
         }
 
         $this->view->controller = $this;
