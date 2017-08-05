@@ -42,7 +42,9 @@ class Default_StructureController extends Zend_Controller_Action
         $name = isset($data['organisationname']) ? $data['organisationname'] :
             (isset($data['unitname']) ? $data['unitname'] : $data['deptname']);
 
-        $html .= '<li class="' . $data['class'] . '"><i></i><p>' . $name . '</p>';
+        if ($data['id'] != '0') {
+            $html .= '<li class="' . $data['class'] . '"><i></i><p>' . $name . '</p>';
+        }
 
         if ($node->isLeaf()) {
             $html .= '</li>';
@@ -50,12 +52,16 @@ class Default_StructureController extends Zend_Controller_Action
             return $html;
         }
 
-        $html .= '<ul>';
+        if ($data['id'] != '0') {
+            $html .= '<ul>';
+        }
         $children = $node->getChildren();
         foreach ($children as $child) {
             $html .= $this->renderTree($child);
         }
-        $html .= '</ul>';
+        if ($data['id'] != '0') {
+            $html .= '</ul>';
+        }
         $html .= '</li>';
 
         return $html;
