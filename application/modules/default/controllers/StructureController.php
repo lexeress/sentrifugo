@@ -64,63 +64,10 @@ class Default_StructureController extends Zend_Controller_Action
 	public function indexAction()
 	{
 		$structureModel = new Default_Model_Structure();
-		$orgData = $structureModel->getOrgData();
-		$unitData = $structureModel->getUnitData();
-		$deptData = $structureModel->getDeptData();
-		$nobu = 'no';
-		foreach($deptData as $rec)
-		{			
-			if($rec['unitid'] == '0')
-			$nobu = 'exists';
-			
-		}
-
-		$orgData['class'] = 'orgunit';
-		$orgTree = new Tree_Node($orgData);
-
-		foreach ($unitData as $unit) {
-		    $unit['class'] = 'bunitclass';
-
-		    $child = new Tree_Node($unit);
-		    $orgTree->addChild($child);
-        }
-
-        $departmentData = $deptData;
-        $dept = current($departmentData);
-        while (!empty($departmentData)) {
-
-            $visitor = new Tree_PreOrderVisitor;
-
-            $children = array_filter($orgTree->accept($visitor), function ($k) {
-                $data = $k->getValue();
-                return $data['class'] != 'orgunit';
-            });
-            foreach ($children as $child) {
-                $unitdata = $child->getValue();
-
-                if (($dept['deptid'] == null && $unitdata['id'] == $dept['unitid']) ||
-                    isset($unitdata['unitid']) &&
-                    $dept['deptid'] == $unitdata['id']  && $dept['unitid'] == $unitdata['unitid']) {
-
-                    $dept['class'] = 'deptclass';
-                    $grandchild = new Tree_Node($dept);
-                    $child->addChild($grandchild);
-
-                    $key = key($departmentData);
-                    unset($departmentData[$key]);
-                    $dept = current($departmentData);
-                }
-            }
-
-            $dept = next($departmentData);
-            if ($dept == false) {
-                $dept = reset($departmentData);
-            }
-        }
+		$orgTree = $structureModel->getOrgTree();
 
         $this->view->controller = $this;
         $this->view->orgTree = $orgTree;
-		$this->view->orgData = $orgData;
 		$this->view->msg = 'This is organization structure';
 	}
 }

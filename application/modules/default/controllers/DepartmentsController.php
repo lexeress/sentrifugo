@@ -312,7 +312,7 @@ class Default_DepartmentsController extends Zend_Controller_Action
             $id = $this->getRequest()->getParam('id');
             $callval = $this->getRequest()->getParam('call');
             $deptModel = new Default_Model_Departments();
-            $deptform = new Default_Form_departments();
+            $deptform = new Default_Form_departments(['deptid' => $id]);
             $statesmodel = new Default_Model_States();
             $citiesmodel = new Default_Model_Cities();
             $countriesModel = new Default_Model_Countries();

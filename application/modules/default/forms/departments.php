@@ -19,6 +19,24 @@
  *
  *  Sentrifugo Support <support@sentrifugo.com>
  ********************************************************************************/
+class FilterValue
+{
+    private $value;
+
+    function __construct($val) {
+        $this->value = $val;
+    }
+
+    function isNotEqual($i) {
+        foreach ($this->value as $node) {
+            $value = $node->getValue();
+            if ($value['id'] == $i['id'])
+                return false;
+        }
+        return true;
+    }
+}
+
 class Default_Form_departments extends Zend_Form
 {
     public function init()
@@ -97,6 +115,27 @@ class Default_Form_departments extends Zend_Form
         $deptModel = new Default_Model_Departments();
         $deptdata = $deptModel->fetchAll('isactive=1', 'deptname');
 
+        $deptId = $this->getAttrib('deptid');
+        $structureModel = new Default_Model_Structure();
+        $orgTree = $structureModel->getOrgTree();
+        $visitor = new Tree_PreOrderVisitor;
+        if ($deptId != null) {
+            foreach ($orgTree->accept($visitor) as $node) {
+                $value = $node->getValue();
+                if ($value['class'] == 'deptclass' && $value['id'] == $deptId) {
+
+                    $childDepartmentsAndMe = $node->accept($visitor);
+                    array_push($childDepartmentsAndMe, $node->getParent());
+                    $deptdataArr = array_filter($deptdata->toArray(),
+                        array(new FilterValue($childDepartmentsAndMe), 'isNotEqual'));
+
+                    break;
+                }
+            }
+        } else {
+            $deptdataArr = $deptdata->toArray();
+        }
+
         $options = array(
             '0_' => 'No Business Unit/Department',
             'Business Units' => array(),
@@ -111,7 +150,8 @@ class Default_Form_departments extends Zend_Form
             $options['Business Units'][$option.'_'] = $value;
         }
 
-        foreach ($deptdata->toArray() as $data) {
+
+        foreach ($deptdataArr as $data) {
             $option = $data['id'];
             $unitoption = $data['unitid'];
             $value = $data['deptname'];

@@ -47,5 +47,68 @@ class Default_Model_Structure extends Zend_Db_Table_Abstract
 		$result= $deptData->fetchAll();
 		return $result;
 	}
+
+	public function getOrgTree()
+    {
+        $orgData = $this->getOrgData();
+        $unitData = $this->getUnitData();
+        $deptData = $this->getDeptData();
+        $nobu = 'no';
+        foreach($deptData as $rec)
+        {
+            if($rec['unitid'] == '0')
+                $nobu = 'exists';
+
+        }
+
+        if ($nobu == 'no') {
+            $unitData = array_filter($unitData, function($k) { return $k['id'] != '0'; });
+        }
+
+        $orgData['class'] = 'orgunit';
+        $orgTree = new Tree_Node($orgData);
+
+        foreach ($unitData as $unit) {
+            $unit['class'] = 'bunitclass';
+
+            $child = new Tree_Node($unit);
+            $orgTree->addChild($child);
+        }
+
+        $departmentData = $deptData;
+        $dept = current($departmentData);
+        while (!empty($departmentData)) {
+
+            $visitor = new Tree_PreOrderVisitor;
+
+            $children = array_filter($orgTree->accept($visitor), function ($k) {
+                $data = $k->getValue();
+                return $data['class'] != 'orgunit';
+            });
+            foreach ($children as $child) {
+                $unitdata = $child->getValue();
+
+                if (($dept['deptid'] == null && $unitdata['id'] == $dept['unitid']) ||
+                    isset($unitdata['unitid']) &&
+                    $dept['deptid'] == $unitdata['id']  && $dept['unitid'] == $unitdata['unitid']) {
+
+                    $dept['class'] = 'deptclass';
+                    $grandchild = new Tree_Node($dept);
+                    $child->addChild($grandchild);
+
+                    $key = key($departmentData);
+                    unset($departmentData[$key]);
+                    $dept = current($departmentData);
+                }
+            }
+
+            $dept = next($departmentData);
+            if ($dept == false) {
+                $dept = reset($departmentData);
+            }
+        }
+
+        return $orgTree;
+    }
 	
 }
