@@ -19,23 +19,6 @@
  *
  *  Sentrifugo Support <support@sentrifugo.com>
  ********************************************************************************/
-class FilterValue
-{
-    private $value;
-
-    function __construct($val) {
-        $this->value = $val;
-    }
-
-    function isNotEqual($i) {
-        foreach ($this->value as $node) {
-            $value = $node->getValue();
-            if ($value['id'] == $i['id'])
-                return false;
-        }
-        return true;
-    }
-}
 
 class Default_Form_departments extends Zend_Form
 {
@@ -113,26 +96,13 @@ class Default_Form_departments extends Zend_Form
         $bunitModel = new Default_Model_Businessunits();
         $bunitdata = $bunitModel->fetchAll('isactive=1', 'unitname');
         $deptModel = new Default_Model_Departments();
-        $deptdata = $deptModel->fetchAll('isactive=1', 'deptname');
 
         $deptId = $this->getAttrib('deptid');
-        $structureModel = new Default_Model_Structure();
-        $orgTree = $structureModel->getOrgTree();
-        $visitor = new Tree_PreOrderVisitor;
+
         if ($deptId != null) {
-            foreach ($orgTree->accept($visitor) as $node) {
-                $value = $node->getValue();
-                if ($value['class'] == 'deptclass' && $value['id'] == $deptId) {
-
-                    $childDepartmentsAndMe = $node->accept($visitor);
-                    array_push($childDepartmentsAndMe, $node->getParent());
-                    $deptdataArr = array_filter($deptdata->toArray(),
-                        array(new FilterValue($childDepartmentsAndMe), 'isNotEqual'));
-
-                    break;
-                }
-            }
+            $deptdataArr = $deptModel->getChildDepartmentsData($deptId);
         } else {
+            $deptdata = $deptModel->fetchAll('isactive=1', 'deptname');
             $deptdataArr = $deptdata->toArray();
         }
 

@@ -19,6 +19,24 @@
  *  Sentrifugo Support <support@sentrifugo.com>
  ********************************************************************************/
 
+class FilterValue
+{
+    private $value;
+
+    function __construct($val) {
+        $this->value = $val;
+    }
+
+    function isNotEqual($i) {
+        foreach ($this->value as $node) {
+            $value = $node->getValue();
+            if ($value['id'] == $i['id'])
+                return false;
+        }
+        return true;
+    }
+}
+
 class Default_Model_Departments extends Zend_Db_Table_Abstract
 {
     protected $_name = 'main_departments';
@@ -108,7 +126,31 @@ class Default_Model_Departments extends Zend_Db_Table_Abstract
 		$deptData = $db->query("select * from main_departments where isactive = 1 AND id = ".$id);
 	    $result= $deptData->fetch();
 		return $result;
-	}
+    }
+
+    public function getChildDepartmentsData($id)
+    {
+        $structureModel = new Default_Model_Structure();
+        $orgTree = $structureModel->getOrgTree();
+        $visitor = new Tree_PreOrderVisitor;
+        $deptdata = $this->fetchAll('isactive=1', 'deptname');
+        $deptdataArr = array();
+
+        foreach ($orgTree->accept($visitor) as $node) {
+            $value = $node->getValue();
+            if ($value['class'] == 'deptclass' && $value['id'] == $id) {
+
+                $childDepartments = $node->accept($visitor);
+                $deptdataArr = array_filter($deptdata->toArray(),
+                    array(new FilterValue($childDepartments), 'isNotEqual'));
+
+                break;
+            }
+        }
+
+        return $deptdataArr;
+    }
+
 	public function getdepts_interview_report()
         {
             $db = Zend_Db_Table::getDefaultAdapter();
@@ -139,6 +181,11 @@ class Default_Model_Departments extends Zend_Db_Table_Abstract
 			return $id;
 		}
 	}
+
+	public function UpdateChildDepartmentsUnits($id)
+    {
+        $childDepartments = $this->getChildDepartmentsData($id);
+    }
 	
 	public function getDepartmentList($bussinessunitid)
 	{
