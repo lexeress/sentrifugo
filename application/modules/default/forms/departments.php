@@ -96,13 +96,13 @@ class Default_Form_departments extends Zend_Form
         $bunitModel = new Default_Model_Businessunits();
         $bunitdata = $bunitModel->fetchAll('isactive=1', 'unitname');
         $deptModel = new Default_Model_Departments();
+        $deptdata = $deptModel->fetchAll('isactive=1', 'deptname');
 
         $deptId = $this->getAttrib('deptid');
 
         if ($deptId != null) {
-            $deptdataArr = $deptModel->getChildDepartmentsData($deptId);
+            $deptdataArr = $deptModel->getPossibleParentsDataForDepartment($deptId);
         } else {
-            $deptdata = $deptModel->fetchAll('isactive=1', 'deptname');
             $deptdataArr = $deptdata->toArray();
         }
 
