@@ -140,16 +140,20 @@ class Default_Model_Departments extends Zend_Db_Table_Abstract
     public function getPossibleParentsDataForDepartment($id)
     {
         $deptdata = $this->fetchAll('isactive=1', 'deptname');
+        $deptdataArray = $deptdata->toArray();
         $childDepartments = $this->getChildDepartmentsData($id);
-        $deptdataArr = array_filter($deptdata->toArray(), function($item) use($childDepartments) {
-            foreach ($childDepartments as $childdept) {
-                if ($childdept['id'] != $item['id'])
-                    return true;
-            }
-            return false;
+        foreach ($childDepartments as $deptToExclude) {
+            $deptdataArray = array_filter($deptdataArray, function ($it) use ($deptToExclude) {
+                return $deptToExclude['id'] != $it['id'];
+            });
+        }
+
+        // filter id
+        $deptdataArray = array_filter($deptdataArray, function ($it) use ($id) {
+            return $it['id'] != $id;
         });
 
-        return $deptdataArr;
+        return $deptdataArray;
     }
 
     public function getdepts_interview_report()

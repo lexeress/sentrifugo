@@ -374,6 +374,7 @@ class Default_DepartmentsController extends Zend_Controller_Action
                     }
                     $deptform->populate($data);
                     $deptform->setDefault('depthead', $data['depthead']);
+                    $deptform->setDefault('unitid', $data['unitid'].'_'.$data['deptid']);
                     $deptform->submit->setLabel('Update');
                     $deptform->state->clearMultiOptions();
                     $deptform->city->clearMultiOptions();
