@@ -525,6 +525,8 @@ class Default_DepartmentsController extends Zend_Controller_Action
                             $where = '';
                             $actionflag = 1;
                         }
+
+                        $deptModel->updateChildDepartTreeIfNeeded($data, $id);
                         $Id = $deptModel->SaveorUpdateDepartmentsUnits($data, $where);
 
                         /* Updating business unit and department for org head*/

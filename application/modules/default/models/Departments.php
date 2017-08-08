@@ -185,6 +185,22 @@ class Default_Model_Departments extends Zend_Db_Table_Abstract
         }
     }
 
+    public function updateChildDepartTreeIfNeeded($dept, $id) {
+        if ($id == '') return;
+
+        $childDepts = $this->getChildDepartmentsData($id);
+
+        $first = current($childDepts);
+
+        if ($first && $dept['unitid'] != $first['unitid']) {
+            foreach ($childDepts as $child) {
+                $data['unitid'] = $dept['unitid'];
+                $where = array('id=?' => $child['id']);
+                $this->update($data, $where);
+            }
+        }
+    }
+
     public function getDepartmentList($bussinessunitid)
     {
         if ($bussinessunitid != '') {
