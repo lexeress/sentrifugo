@@ -45,11 +45,11 @@
 $startdate=$this->form->start_date->getValue();
 sapp_Helper::viewHeader();
 sapp_Helper::viewBody('alt','Name',(!empty($this->data['unitname']))?$this->data['unitname']:"...",'Code',(!empty($this->data['unitcode']))?$this->data['unitcode']:"...");
-sapp_Helper::viewBody('nor','Description',(!empty($this->data['description']))?$this->data['description']:"...",'Started On',(!empty($startdate))? $this->form->start_date->getValue():"...");
-sapp_Helper::viewBody('alt','Time Zone',(!empty($this->data['timezone']))?$this->data['timezone']:"...",'Country',(!empty($this->data['country']))?$this->data['country']:"...");
-sapp_Helper::viewBody('nor','State',(!empty($this->data['state']))?$this->data['state']:"...",'City',(!empty($this->data['city']))?$this->data['city']:"...");
-sapp_Helper::viewBody('alt','Street Address 1',(!empty($this->data['address1']))?$this->data['address1']:"...",'Street Address 2',(!empty($this->data['address2']))?$this->data['address2']:"...");
-sapp_Helper::viewBody('nor','Street Address 3',(!empty($this->data['address3']))?$this->data['address3']:"...",'','');
+sapp_Helper::viewBody('nor','Unit Head',(!empty($this->data['unithead']))?$this->data['unithead']:"...",'Description',(!empty($this->data['description']))?$this->data['description']:"...");
+sapp_Helper::viewBody('alt','Started On',(!empty($startdate))? $this->form->start_date->getValue():"...",'Time Zone',(!empty($this->data['timezone']))?$this->data['timezone']:"...");
+sapp_Helper::viewBody('nor','Country',(!empty($this->data['country']))?$this->data['country']:"...",'State',(!empty($this->data['state']))?$this->data['state']:"...");
+sapp_Helper::viewBody('alt','City',(!empty($this->data['city']))?$this->data['city']:"...",'City','Street Address 1',(!empty($this->data['address1']))?$this->data['address1']:"...");
+sapp_Helper::viewBody('nor','Street Address 2',(!empty($this->data['address2']))?$this->data['address2']:"...",'Street Address 3',(!empty($this->data['address3']))?$this->data['address3']:"...");
 sapp_Helper::viewFooter();
 ?>
 				

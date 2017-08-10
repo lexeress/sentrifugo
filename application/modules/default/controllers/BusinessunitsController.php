@@ -408,6 +408,7 @@ class Default_BusinessunitsController extends Zend_Controller_Action
     public function viewAction()
     {
         $orgInfoModel = new Default_Model_Organisationinfo();
+        $employeeModel = new Default_Model_Employee();
         $getorgData = $orgInfoModel->getorgrecords();
         if (!empty($getorgData)) {
             $orgdata = '';
@@ -491,6 +492,14 @@ class Default_BusinessunitsController extends Zend_Controller_Action
                     if (!empty($cityname)) {
                         $data['city'] = $cityname[0]['city'];
                     }
+                }
+                if (!empty($data['unithead'])) {
+                    $empdata = $employeeModel->getsingleEmployeeData($data['unithead']);
+                    if (!empty($empdata) && $empdata != 'norows')
+                        $businessunitsform->unithead->addMultiOption($empdata[0]['user_id'], utf8_encode($empdata[0]['userfullname']));
+                    $data['unithead'] = $empdata[0]['userfullname'];
+                } else {
+                    $data['unithead'] = "";
                 }
                 $this->view->editpermission = $permission;
                 $this->view->controllername = $objName;
