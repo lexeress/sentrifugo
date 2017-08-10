@@ -78,6 +78,22 @@
 				  <label>Description</label>
 				<div class="division"><?php echo $this->form->description; ?></div>
 				</div>
+
+                <div class="new-form-ui">
+                    <label >Unit Head</label>
+                    <div class="division"><?php echo $this->form->unithead; ?>
+                        <?php if(isset($this->msgarray['unithead'])){?>
+                            <span class="errors" id="errors-<?php echo $this->form->unithead->getId(); ?>"><?php echo $this->msgarray['unithead'];?></span>
+                        <?php }?>
+
+                        <?php if(!empty($this->organisationHead)) { ?>
+                            <?php if(in_array('employee',$this->popConfigPermission)) { ?>
+                                <span class="add-coloum" onclick="displaydeptform('<?php echo BASE_URL.'employee/addemppopup/deptidforhead/'.$this->form->getValue('id'); ?>','Department Head');"> Add Unit Head </span>
+                            <?php }} else { ?>
+                            <span class="errors">Please add an organization head first to add a unit head.</span>
+                        <?php }?>
+                    </div>
+                </div>
 							
 				<div class="new-form-ui ">
 				  <label>Started On <img title="<?php echo DATE_DESCRIPTION;?>" src="<?php echo $this->baseUrl().'/public/media/';?>images/help.png" /> </label>
