@@ -134,6 +134,40 @@ class Default_EmpcommunicationdetailsController extends Zend_Controller_Action
                                 $data = $empcommdetailsModal->getsingleEmpCommDetailsData($id);
 
                                 if (!empty($data)) {
+
+                                    if ($data[0]['work_country'] != '') {
+                                        $countrieslistArr = $countriesModel->getCountryCode($data[0]['work_country']);
+                                        if (sizeof($countrieslistArr) > 0) {
+                                            $empcommdetailsform->work_country->addMultiOption('', 'Select Country');
+                                            foreach ($countrieslistArr as $countrieslistres) {
+                                                $empcommdetailsform->work_country->addMultiOption($countrieslistres['id'], $countrieslistres['country_name']);
+                                            }
+                                        }
+                                    }
+
+                                    if ($data[0]['work_country'] != '') {
+                                        $stateworklistArr = $statesmodel->getStatesList($data[0]['work_country']);
+                                        if (sizeof($stateworklistArr) > 0) {
+                                            $empcommdetailsform->work_state->addMultiOption('', 'Select State');
+                                            foreach ($stateworklistArr as $statelistres) {
+                                                $empcommdetailsform->work_state->addMultiOption($statelistres['id'] . '!@#' . $statelistres['state_name'], $statelistres['state_name']);
+                                            }
+                                        }
+                                    }
+
+                                    if ($data[0]['work_state'] != '') {
+                                        $cityworklistArr = $citiesmodel->getCitiesList($data[0]['work_state']);
+                                        if (sizeof($cityworklistArr) > 0) {
+                                            $empcommdetailsform->work_city->addMultiOption('', 'Select City');
+                                            foreach ($cityworklistArr as $cityworklistres) {
+                                                $empcommdetailsform->work_city->addMultiOption($cityworklistres['id'] . '!@#' . $cityworklistres['city_name'], $cityworklistres['city_name']);
+                                            }
+                                        }
+                                    }
+                                    
+                                    
+                                    
+                                    
                                     if ($data[0]['perm_country'] != '') {
                                         $countrieslistArr = $countriesModel->getCountryCode($data[0]['perm_country']);
                                         if (sizeof($countrieslistArr) > 0) {
@@ -199,7 +233,53 @@ class Default_EmpcommunicationdetailsController extends Zend_Controller_Action
                                         $currcityNameArr = $citiesmodel->getCityName($data[0]['current_city']);
                                     }
 
+                                    if ($data[0]['current_country'] != '') {
+                                        $countrieslistArr = $countriesModel->getCountryCode($data[0]['current_country']);
+                                        if (sizeof($countrieslistArr) > 0) {
+                                            $empcommdetailsform->current_country->addMultiOption('', 'Select Country');
+                                            foreach ($countrieslistArr as $countrieslistres) {
+                                                $empcommdetailsform->current_country->addMultiOption($countrieslistres['id'], $countrieslistres['country_name']);
+                                            }
+                                        }
+
+                                    }
+
+
+                                    if ($data[0]['current_country'] != '' && $data[0]['current_state'] != '') {
+                                        $statecurrlistArr = $statesmodel->getStatesList($data[0]['current_country']);
+                                        if (sizeof($statecurrlistArr) > 0) {
+                                            $empcommdetailsform->current_state->addMultiOption('', 'Select State');
+                                            foreach ($statecurrlistArr as $statecurrlistres) {
+                                                $empcommdetailsform->current_state->addMultiOption($statecurrlistres['id'] . '!@#' . $statecurrlistres['state_name'], $statecurrlistres['state_name']);
+                                            }
+                                        }
+                                        $currstateNameArr = $statesmodel->getStateName($data[0]['current_state']);
+
+                                    }
+                                    if ($data[0]['current_country'] != '' && $data[0]['current_state'] != '' && $data[0]['current_city'] != '') {
+                                        $cityCurrlistArr = $citiesmodel->getCitiesList($data[0]['current_state']);
+
+                                        if (sizeof($cityCurrlistArr) > 0) {
+                                            $empcommdetailsform->current_city->addMultiOption('', 'Select State');
+                                            foreach ($cityCurrlistArr as $cityCurrlistres) {
+                                                $empcommdetailsform->current_city->addMultiOption($cityCurrlistres['id'] . '!@#' . $cityCurrlistres['city_name'], $cityCurrlistres['city_name']);
+                                            }
+                                        }
+                                        $currcityNameArr = $citiesmodel->getCityName($data[0]['current_city']);
+                                    }
+
                                     $empcommdetailsform->populate($data[0]);
+                                    if ($data[0]['work_country'] != '')
+                                        $empcommdetailsform->setDefault('work_country', $data[0]['work_country']);
+                                    if ($data[0]['work_state'] != '') {
+                                        $workstateNameArr = $statesmodel->getStateName($data[0]['work_state']);
+                                        $empcommdetailsform->setDefault('work_state', $workstateNameArr[0]['id'] . '!@#' . $workstateNameArr[0]['statename']);
+                                    }
+                                    if ($data[0]['work_city'] != '') {
+                                        $workcityNameArr = $citiesmodel->getCityName($data[0]['work_city']);
+                                        $empcommdetailsform->setDefault('work_city', $workcityNameArr[0]['id'] . '!@#' . $workcityNameArr[0]['cityname']);
+                                    }
+                                    
                                     if ($data[0]['perm_country'] != '')
                                         $empcommdetailsform->setDefault('perm_country', $data[0]['perm_country']);
                                     if ($data[0]['perm_state'] != '') {
@@ -218,6 +298,31 @@ class Default_EmpcommunicationdetailsController extends Zend_Controller_Action
                                         $empcommdetailsform->setDefault('current_city', $currcityNameArr[0]['id'] . '!@#' . $currcityNameArr[0]['cityname']);
 
                                 }
+                                if (!empty($data[0]['work_country'])) {
+                                    $countryname = $countriesModel->getCountryCode($data[0]['work_country']);
+                                    if (!empty($countryname)) {
+                                        $data[0]['work_country'] = $countryname[0]['country_name'];
+                                    } else {
+                                        $data[0]['work_country'] = "";
+                                    }
+                                }
+                                if (!empty($data[0]['work_state'])) {
+                                    $statename = $statesmodel->getStateName($data[0]['work_state']);
+                                    if (!empty($statename)) {
+                                        $data[0]['work_state'] = $statename[0]['statename'];
+                                    } else {
+                                        $data[0]['work_state'] = "";
+                                    }
+                                }
+                                if (!empty($data[0]['work_city'])) {
+                                    $cityname = $citiesmodel->getCityName($data[0]['work_city']);
+                                    if (!empty($cityname)) {
+                                        $data[0]['work_city'] = $cityname[0]['cityname'];
+                                    } else {
+                                        $data[0]['work_city'] = "";
+                                    }
+                                }
+
                                 if (!empty($data[0]['perm_country'])) {
                                     $countryname = $countriesModel->getCountryCode($data[0]['perm_country']);
                                     if (!empty($countryname)) {
