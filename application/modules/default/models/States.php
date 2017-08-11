@@ -223,7 +223,26 @@ class Default_Model_States extends Zend_Db_Table_Abstract
                             ->order('s.state');
 		
 		return $this->fetchAll($select)->toArray();
-    } 
+    }
+
+    public function getActiveStatesList_excel()
+    {
+        $db = Zend_Db_Table::getDefaultAdapter();
+        $parray = array();
+        $query = "select countryid,state,state_id_org from main_states where isactive = 1";
+        $res = $db->query($query)->fetchAll();
+        if(!empty($res))
+        {
+            foreach($res as $row)
+            {
+                $parray[strtolower($row['state'])] = array(
+                    'countryid' => $row['countryid'],
+                    'state_id_org' => $row['state_id_org']
+                );
+            }
+        }
+        return $parray;
+    }
 	
 	public function getStateNameData($state_id_org)
 	{

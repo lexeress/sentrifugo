@@ -455,6 +455,9 @@ class sapp_Helper
         $emp_model = new Default_Model_Employee();
         $usersModel = new Default_Model_Usermanagement();
         $identity_code_model = new Default_Model_Identitycodes();
+        $countries_model = new Default_Model_Countries();
+        $states_model = new Default_Model_States();
+        $cities_model = new Default_Model_Cities();
                 
         $objReader = PHPExcel_IOFactory::createReaderForFile($file_name);
         $objPHPExcel = $objReader->load($file_name);
@@ -464,13 +467,68 @@ class sapp_Helper
         $sizeOfWorksheet = $sheet->getHighestDataRow();
         $highestColumn 	 = $sheet->getHighestDataColumn();
         if($sizeOfWorksheet > 1)
-        {    		
-            $column_salary_currency = 18;$column_salary_type = 19;$column_salary = 20;
+        {
+            $current = $column_prefix = 0;
+
+            // mandatory fields
+            $column_first_name = ++$current;
+            $column_last_name = ++$current;
+            $column_employee_id = ++$current;
+            $column_username = ++$current;
+            $column_role_type = ++$current;
+            $column_email = ++$current;
+            $column_business_unit = ++$current;
+            $column_department = ++$current;
+            $column_reporting_manager = ++$current;
+            $column_job_title = ++$current;
+            $column_position = ++$current;
+            $column_employment_status = ++$current;
+            $column_date_of_joining = ++$current;
+
+            //non-mandatory fields
+            $column_date_of_leaving = ++$current;
+            $column_experience = ++$current;
+            $column_extension = ++$current;
+            $column_work_telephone_number = ++$current;
+            $column_fax = ++$current;
+
+            $column_salary_currency = ++$current;
+            $column_salary_type = ++$current;
+            $column_salary = ++$current;
+            $column_work_country = ++$current;
+            $column_work_state = ++$current;
+            $column_work_city = ++$current;
+            $column_work_street = ++$current;
+            $column_work_pincode = ++$current;
+
             $arrReqHeaders = array(
-                'Prefix','First name','Last name','Employee Id','Role Type','Email','Business Unit','Department','Reporting manager','Job Title' ,
-                'Position','Employment Status','Date of joining','Date of leaving','Experience','Extension',
-                'Work telephone number','Fax',$column_salary_currency => 'Salary Currency',
-                $column_salary_type =>'Pay Frequency',$column_salary => 'Salary'
+                $column_prefix => 'Prefix',
+                $column_first_name => 'First Name',
+                $column_last_name => 'Last Name',
+                $column_employee_id => 'Employee Id',
+                $column_username => 'Username',
+                $column_role_type => 'Role Type',
+                $column_email =>'Email',
+                $column_business_unit => 'Business Unit',
+                $column_department => 'Department',
+                $column_reporting_manager => 'Reporting manager employee ID',
+                $column_job_title => 'Job Title',
+                $column_position => 'Position',
+                $column_employment_status => 'Employment Status',
+                $column_date_of_joining => 'Date of joining',
+                $column_date_of_leaving => 'Date of leaving',
+                $column_experience => 'Experience',
+                $column_extension => 'Extension',
+                $column_work_telephone_number => 'Work telephone number',
+                $column_fax => 'Fax',
+                $column_salary_currency => 'Salary Currency',
+                $column_salary_type =>'Pay Frequency',
+                $column_salary => 'Salary',
+                $column_work_country => 'Work Country',
+                $column_work_state => 'Work State',
+                $column_work_city => 'Work City',
+                $column_work_street => 'Work Street',
+                $column_work_pincode => 'Work Postal Code'
             );
 		                        
             //Get first/header from excel
@@ -491,11 +549,15 @@ class sapp_Helper
             $emps_arr = $emp_model->getEmps_emp_excel();
             $emails_arr = $emps_arr['email'];
             $emp_ids_arr = $emps_arr['ids'];
+            $emp_username_arr = $emps_arr['username'];
             $emp_depts_arr = $emp_model->getEmpsDeptWise();
             $dept_bu_arr = $emp_model->getDeptBUWise();
             $pos_jt_arr = $emp_model->getPosJTWise();
             $currency_arr = $emp_model->getCurrency_excel();
             $salary_type_arr = $emp_model->getPayfrequency_excel();
+            $countries_arr = $countries_model->getActiveCountries_excel();
+            $states_arr = $states_model->getActiveStatesList_excel();
+            $cities_arr = $cities_model->getActiveCitiesList_excel();
            
             $identity_codes = $identity_code_model->getIdentitycodesRecord();
             $emp_identity_code = isset($identity_codes[0])?$identity_codes[0]['employee_code']:"";
@@ -507,6 +569,7 @@ class sapp_Helper
                 //start of validations
                 $ex_prefix_arr = array();
                 $ex_firstname_arr = array();$ex_lastname_arr = array();
+                $ex_username_arr = array();
                 $ex_role_arr = array();$ex_email_arr = array();
                 $ex_bu_arr = array();$ex_dep_arr = array();$ex_rm_arr = array();$ex_jt_arr = array();$ex_pos_arr = array();
                 $ex_es_arr = array();$ex_doj_arr = array();$ex_dol_arr = array();$ex_exp_arr = array();$ex_ext_arr = array();
@@ -524,145 +587,159 @@ class sapp_Helper
                     }
                 
                     //start of mandatory checking                  
-                    if(empty($rowData[1]))
+                    if(empty($rowData[$column_first_name]))
                     {
                         $err_msg = "First name cannot be empty at row ".$i.".";
                         break;
                     }
-                    if(empty($rowData[2]))
+                    if(empty($rowData[$column_last_name]))
                     {
                         $err_msg = "Last name cannot be empty at row ".$i.".";
                         break;
                     }
-                    if(empty($rowData[3]))
+                    if(empty($rowData[$column_employee_id]))
                     {
                         $err_msg = "Employee Id cannot be empty at row ".$i.".";
                         break;
                     }
-                    if (!empty($rowData[3]) && strlen($rowData[3]) > 5)
+                    if (!empty($rowData[$column_employee_id]) && strlen($rowData[$column_employee_id]) > 5)
                     {
                         $err_msg = "Employee Id length should be less than or equal to five at row ".$i.".";
                         break;
-                    }                    
-                    if(empty($rowData[4]))
+                    }
+                    if (empty($rowData[$column_username]))
+                    {
+                        $err_msg = "Username cannot be empty at row ".$i.".";
+                        break;
+                    }
+                    if (!empty($rowData[$column_username]) && strlen($rowData[$column_username]) > 255)
+                    {
+                        $err_msg = "Username should be less than or equal to 255 ar row".$i.".";
+                    }
+                    if(empty($rowData[$column_role_type]))
                     {
                         $err_msg = "Role type cannot be empty at row ".$i.".";
                         break;
                     }
-                    if(empty($rowData[5]))
+                    if(empty($rowData[$column_email]))
                     {
                         $err_msg = "Email cannot be empty at row ".$i.".";
                         break;
                     }
-                    if(!in_array($rowData[4], $mng_roles_arr) && empty($rowData[7]))
+                    if(!in_array($rowData[$column_role_type], $mng_roles_arr) && empty($rowData[$column_department]))
                     {
                         $err_msg = "Department cannot be empty at row ".$i.".";
                         break;
                     }                    
-                    if(empty($rowData[8]))
+                    if(empty($rowData[$column_reporting_manager]))
                     {
                         $err_msg = "Reporting manager cannot be empty at row ".$i.".";
                         break;
                     }
-                    if(!empty($rowData[10]) && empty($rowData[9]))
+                    if(!empty($rowData[$column_position]) && empty($rowData[$column_job_title]))
                     {
                         $err_msg = "Job title cannot be empty at row ".$i.".";
                         break;
                     }
-                    if(!empty($rowData[9]) && empty($rowData[10]))
+                    if(!empty($rowData[$column_job_title]) && empty($rowData[$column_position]))
                     {
                         $err_msg = "Position cannot be empty at row ".$i.".";
                         break;
                     }                    
-                    if(empty($rowData[11]))
+                    if(empty($rowData[$column_employment_status]))
                     {
                         $err_msg = "Employment status cannot be empty at row ".$i.".";
                         break;
                     }
-                    if(empty($rowData[12]))
+                    if(empty($rowData[$column_date_of_joining]))
                     {
                         $err_msg = "Date of joining cannot be empty at row ".$i.".";
                         break;
                     }
-                    if(in_array(strtolower($rowData[11]), $dol_emp_stat_arr) && empty($rowData[13]))
+                    if(in_array(strtolower($rowData[$column_employment_status]), $dol_emp_stat_arr) && empty($rowData[$column_date_of_leaving]))
                     {
                         $err_msg = "Date of leaving cannot be empty at row ".$i.".";
                         break;
                     }
-                    if(!in_array($rowData[11], $dol_emp_stat_arr) && !empty($rowData[13]) && in_array($emp_stat_arr[strtolower($rowData[11])],$emp_stat_arr))
+                    if(!in_array($rowData[$column_employment_status], $dol_emp_stat_arr) && !empty($rowData[$column_date_of_leaving]) && in_array($emp_stat_arr[strtolower($rowData[$column_employment_status])],$emp_stat_arr))
                     {
-                        $err_msg = "Date of leaving must be empty for '".$rowData[11]."' at row ".$i.".";
+                        $err_msg = "Date of leaving must be empty for '".$rowData[$column_employment_status]."' at row ".$i.".";
                         break;
                     }
                     // end of mandatory checking
 
                     // start of pattern checking
-                    if (!preg_match("/^(?=.*[a-zA-Z])([^ ][a-zA-Z0-9 ]*)$/", trim($rowData[0])) && !empty($rowData[0]) )
+                    if (!preg_match("/^(?=.*[a-zA-Z])([^ ][a-zA-Z0-9 ]*)$/", trim($rowData[$column_prefix])) && !empty($rowData[$column_prefix]) )
                     {
                         $err_msg = "Prefix is not a valid format at row ".$i.".";
                         break;
                     }
-                    if (!preg_match("/^([a-zA-Z.]+ ?)+$/", $rowData[1])  && !empty($rowData[1]))
+                    if (!preg_match("/^([a-zA-Z.]+ ?)+$/", $rowData[$column_first_name])  && !empty($rowData[$column_first_name]))
                     {
                         $err_msg = "First name is not a valid format at row ".$i.".";
                         break;
                     }
-                    if (!preg_match("/^([a-zA-Z.]+ ?)+$/", $rowData[2])  && !empty($rowData[2]))
+                    if (!preg_match("/^([a-zA-Z.]+ ?)+$/", $rowData[$column_last_name])  && !empty($rowData[$column_last_name]))
                     {
                         $err_msg = "Last name is not a valid format at row ".$i.".";
                         break;
                     }
-                    if (!preg_match("/^[0-9]+?$/", $rowData[3])  && !empty($rowData[3]))
+                    if (!preg_match("/^[0-9]+?$/", $rowData[$column_employee_id])  && !empty($rowData[$column_employee_id]))
                     {
                         $err_msg = "Employee Id is not a valid format at row ".$i.".";
                         break;
                     }
-                    if (!preg_match("/^[a-zA-Z]+?$/", $rowData[4])  && !empty($rowData[4]))
+                    if (!preg_match("/^([a-zA-Z0-9.]+ ?)+$/", $rowData[$column_username]) && !empty($rowData[$column_username]))
+                    {
+                        $err_msg = "Username is not a valid format at row ".$i.".";
+                        break;
+                    }
+                    if (!preg_match("/^[a-zA-Z]+?$/", $rowData[$column_role_type])  && !empty($rowData[$column_role_type]))
                     {
                         $err_msg = "Role type is not a valid format at row ".$i.".";
                         break;
                     }
-                    if (!preg_match("/^(?!.*\.{2})[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/", $rowData[5])  && !empty($rowData[5]))
+                    if (!preg_match("/^(?!.*\.{2})[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/", $rowData[$column_email])  && !empty($rowData[$column_email]))
                     {
                         $err_msg = "Email is not a valid format at row ".$i.".";                        
                         break;
                     }
-                    if(!preg_match("/^[a-zA-Z0-9\&\'\.\s]+$/", $rowData[6])  && !empty($rowData[6]))
+                    if(!preg_match("/^[a-zA-Z0-9\&\'\.\s]+$/", $rowData[$column_business_unit])  && !empty($rowData[$column_business_unit]))
                     {
                         $err_msg = "Business unit is not a valid format at row ".$i.".";
                         break;
                     }
-                    if(!preg_match("/^[a-zA-Z0-9\&\'\.\s]+$/", $rowData[7])  && !empty($rowData[7]))
+                    if(!preg_match("/^[a-zA-Z0-9\&\'\.\s]+$/", $rowData[$column_department])  && !empty($rowData[$column_department]))
                     {
                         $err_msg = "Department is not a valid format at row ".$i.".";
                         break;
                     }
-                    if(!preg_match("/^[a-zA-Z0-9\&\'\.\s]+$/", $rowData[8])  && !empty($rowData[8]))
+                    if(!preg_match("/^[a-zA-Z0-9\&\'\.\s]+$/", $rowData[$column_reporting_manager])  && !empty($rowData[$column_reporting_manager]))
                     {
                         $err_msg = "Reporting manager is not a valid format at row ".$i.".";
                         break;
                     }
-                    if(!preg_match("/^[a-zA-Z][a-zA-Z0-9\s]*$/", $rowData[9])  && !empty($rowData[9]))
+                    if(!preg_match("/^[a-zA-Z][a-zA-Z0-9\s]*$/", $rowData[$column_job_title])  && !empty($rowData[$column_job_title]))
                     {
                         $err_msg = "Job title is not a valid format at row ".$i.".";
                         break;
                     }
-                    if(!preg_match("/^[a-zA-Z][a-zA-Z0-9\-\s]*$/i", $rowData[10])  && !empty($rowData[10]))
+                    if(!preg_match("/^[a-zA-Z][a-zA-Z0-9\-\s]*$/i", $rowData[$column_position])  && !empty($rowData[$column_position]))
                     {
                         $err_msg = "Position is not a valid format at row ".$i.".";
                         break;
                     }
-                    if(!preg_match("/^(?=.*[a-zA-Z])([^ ][a-zA-Z0-9 ]*)$/", $rowData[11])  && !empty($rowData[11]))
+                    if(!preg_match("/^(?=.*[a-zA-Z])([^ ][a-zA-Z0-9 ]*)$/", $rowData[$column_employment_status])  && !empty($rowData[$column_employment_status]))
                     {
                         $err_msg = "Employment status is not a valid format at row ".$i.".";
                         break;
                     }
                     $test_doj = '';
-                    if(!empty($rowData[12]))
+                    if(!empty($rowData[$column_date_of_joining]))
                     {
                         try
                         {
-                        	$var = $rowData[12];
+                        	$var = $rowData[$column_date_of_joining];
                         	$date = str_replace('/', '-', $var);
                         	$test_doj = date('Y-m-d', strtotime($date));
 							//date format 2012-09-12(y-m-d)
@@ -677,38 +754,38 @@ class sapp_Helper
                         }                    
                     }
                     
-                    if(!empty($rowData[13]))
+                    if(!empty($rowData[$column_date_of_leaving]))
                     {
                         try
                         {
-                        	$var = $rowData[13];
+                        	$var = $rowData[$column_date_of_leaving];
                         	$date = str_replace('/', '-', $var);
                         	$test_dol= date('Y-m-d', strtotime($date));
                         } catch (Exception $ex) {
                             return array('status' => 'error' , 'msg' => "Date of leaving is not a valid format at row ".$i.".");
                         }                    
                     }
-                    if(!empty($rowData[13]) && $rowData[13] < $rowData[12])
+                    if(!empty($rowData[$column_date_of_leaving]) && $rowData[$column_date_of_leaving] < $rowData[$column_date_of_joining])
                     {
                         $err_msg = "Date of leaving must be greater than date of joining at row ".$i.".";
                         break;
                     }
-                    if(!preg_match("/^[0-9]\d{0,1}(\.\d*)?$/", $rowData[14])  && !empty($rowData[14]))
+                    if(!preg_match("/^[0-9]\d{0,1}(\.\d*)?$/", $rowData[$column_experience])  && !empty($rowData[$column_experience]))
                     {
                         $err_msg = "Experience is not a valid format at row ".$i.".";
                         break;
                     }
-                    if(!preg_match("/^[0-9]+$/", $rowData[15])  && !empty($rowData[15]))
+                    if(!preg_match("/^[0-9]+$/", $rowData[$column_extension])  && !empty($rowData[$column_extension]))
                     {
                         $err_msg = "Extension is not a valid format at row ".$i.".";
                         break;
                     }
-                    if(!preg_match("/^(?!0{10})[0-9\+\-\)\(]+$/", $rowData[16])  && !empty($rowData[16]))
+                    if(!preg_match("/^(?!0{10})[0-9\+\-\)\(]+$/", $rowData[$column_work_telephone_number])  && !empty($rowData[$column_work_telephone_number]))
                     {
                         $err_msg = "Work telephone number is not a valid format at row ".$i.".";
                         break;
                     }
-                    if(!preg_match("/^[0-9\+\-\)\(]+$/", $rowData[17])  && !empty($rowData[17]))
+                    if(!preg_match("/^[0-9\+\-\)\(]+$/", $rowData[$column_fax])  && !empty($rowData[$column_fax]))
                     {
                         $err_msg = "Fax is not a valid format at row ".$i.".";
                         break;
@@ -734,57 +811,83 @@ class sapp_Helper
                         $err_msg = $arrReqHeaders[$column_salary]." cannot be zero at row ".$i.".";
                         break;
                     }
+                    if(!preg_match("/^[a-zA-Z]+$/", $rowData[$column_work_country])  && !empty($rowData[$column_work_country]))
+                    {
+                        $err_msg = $arrReqHeaders[$column_work_country]." is not a valid format at row ".$i.".";
+                        break;
+                    }
+                    if(!preg_match("/^[a-zA-Z]+$/", $rowData[$column_work_state])  && !empty($rowData[$column_work_state]))
+                    {
+                        $err_msg = $arrReqHeaders[$column_work_state]." is not a valid format at row ".$i.".";
+                        break;
+                    }
+                    if(!preg_match("/^[a-zA-Z]+$/", $rowData[$column_work_street])  && !empty($rowData[$column_work_street]))
+                    {
+                        $err_msg = $arrReqHeaders[$column_work_street]." is not a valid format at row ".$i.".";
+                        break;
+                    }
+                    if(!preg_match("/^[a-zA-Z0-9]+$/", $rowData[$column_work_pincode])  && !empty($rowData[$column_work_pincode]))
+                    {
+                        $err_msg = $arrReqHeaders[$column_work_pincode]." is not a valid format at row ".$i.".";
+                        break;
+                    }
+                    
                     // end of pattern checking
 
                     // start of checking existence in the system.
-                    if(!array_key_exists(strtolower($rowData[0]), $prefix_arr) && !empty($rowData[0]))
+                    if(!array_key_exists(strtolower($rowData[$column_prefix]), $prefix_arr) && !empty($rowData[$column_prefix]))
                     {
                         $err_msg = "Unknown prefix at row ".$i.".";
                         break;
                     }
-                    $employeeId_final = trim($emp_identity_code).trim($rowData[3]);
-                    if(in_array(strtolower($employeeId_final),$emp_ids_arr) && !empty($rowData[3]))
+                    $employeeId_final = trim($emp_identity_code).trim($rowData[$column_employee_id]);
+                    if(in_array(strtolower($employeeId_final),$emp_ids_arr) && !empty($rowData[$column_employee_id]))
                     {
                         $err_msg = "Employee Id already exists at row ".$i.".";
                         break;
                     }
-                    if(!array_key_exists(strtolower($rowData[4]), $roles_arr)  && !empty($rowData[4]))
+                    if (!array_key_exists(strtolower($rowData[$column_username]), $emp_username_arr) && !empty($rowData[$column_username]))
+                    {
+                        $err_msg = "Username already exists at row ".$i.".";
+                        
+                    }
+                    if(!array_key_exists(strtolower($rowData[$column_role_type]), $roles_arr)  && !empty($rowData[$column_role_type]))
                     {
                         $err_msg = "Unknown role type at row ".$i.".";
                         break;
                     }
-                    if(in_array(strtolower($rowData[5]),$emails_arr) && !empty($rowData[5]))
+                    if(in_array(strtolower($rowData[$column_email]),$emails_arr) && !empty($rowData[$column_email]))
                     {
                         $err_msg = "Email already exists at row ".$i.".";
                         break;
                     }                    
-                    if(!array_key_exists(strtolower($rowData[6]), $bu_arr)  && !empty($rowData[6]))
+                    if(!array_key_exists(strtolower($rowData[$column_business_unit]), $bu_arr)  && !empty($rowData[$column_business_unit]))
                     {
                         $err_msg = "Unknown business unit at row ".$i.".";
                         break;
                     }
-                    if(!array_key_exists(strtolower($rowData[7]), $dep_arr)  && !empty($rowData[7]))
+                    if(!array_key_exists(strtolower($rowData[$column_department]), $dep_arr)  && !empty($rowData[$column_department]))
                     {
                         $err_msg = "Unknown department at row ".$i.".";
                         break;
                     }
 
-                    if(!in_array(strtolower($rowData[8]),$emp_ids_arr) && !empty($rowData[8]))
+                    if(!in_array(strtolower($rowData[$column_reporting_manager]),$emp_ids_arr) && !empty($rowData[$column_reporting_manager]))
                     {
                         $err_msg = "Unknown reporting manager at row ".$i.".";
                         break;
                     }
-                    if(!array_key_exists(strtolower($rowData[9]), $job_arr)  && !empty($rowData[9]))
+                    if(!array_key_exists(strtolower($rowData[$column_job_title]), $job_arr)  && !empty($rowData[$column_job_title]))
                     {
                         $err_msg = "Unknown job title at row ".$i.".";
                         break;
                     }
-                    if(!array_key_exists(strtolower($rowData[10]), $positions_arr)  && !empty($rowData[10]))
+                    if(!array_key_exists(strtolower($rowData[$column_position]), $positions_arr)  && !empty($rowData[$column_position]))
                     {
                         $err_msg = "Unknown position at row ".$i.".";
                         break;
                     }
-                    if(!array_key_exists(strtolower($rowData[11]), $emp_stat_arr)  && !empty($rowData[11]))
+                    if(!array_key_exists(strtolower($rowData[$column_employment_status]), $emp_stat_arr)  && !empty($rowData[$column_employment_status]))
                     {
                         $err_msg = "Unknown employment status at row ".$i.".";
                         break;
@@ -799,17 +902,33 @@ class sapp_Helper
                         $err_msg = "Unknown ".  strtolower($arrReqHeaders[$column_salary_type])." at row ".$i.".";
                         break;
                     }
+                    if(!array_key_exists(strtolower($rowData[$column_work_country]), $countries_arr) && !empty($rowData[$column_work_country]))
+                    {
+                        $err_msg = "Unknown ". strtolower($arrReqHeaders[$column_work_country])." at row ".$i.".";
+                        break;
+                    }
+                    if(!array_key_exists(strtolower($rowData[$column_work_state]), $states_arr) && !empty($rowData[$column_work_state]))
+                    {
+                        $err_msg = "Unknown ". strtolower($arrReqHeaders[$column_work_state])." at row ".$i.".";
+                        break;
+                    }
+                    if(!array_key_exists(strtolower($rowData[$column_work_city]), $cities_arr) && !empty($rowData[$column_work_city]))
+                    {
+                        $err_msg = "Unknown ". strtolower($arrReqHeaders[$column_work_city])." at row ".$i.".";
+                        break;
+                    }
+
                     // end of checking existence in the system.                    
                     
-                    if(!empty($rowData[7]))
+                    if(!empty($rowData[$column_department]))
                     {
-                        if(isset($emp_depts_arr[$dep_arr[strtolower($rowData[7])]]) && !in_array(strtolower($rowData[8]),$emp_depts_arr[$dep_arr[strtolower($rowData[7])]]) )
+                        if(isset($emp_depts_arr[$dep_arr[strtolower($rowData[$column_department])]]) && !in_array(strtolower($rowData[$column_reporting_manager]),$emp_depts_arr[$dep_arr[strtolower($rowData[$column_department])]]) )
                         {
                             if(isset($emp_depts_arr[0]) && is_array($emp_depts_arr[0]))
                             {
-                                if(!in_array(strtolower($rowData[8]),$emp_depts_arr[0]))
+                                if(!in_array(strtolower($rowData[$column_reporting_manager]),$emp_depts_arr[0]))
                                 {
-                                    $err_msg = "Reporting manager does not belong to '".$rowData[7]."' department at row ".$i.".";
+                                    $err_msg = "Reporting manager does not belong to '".$rowData[$column_department]."' department at row ".$i.".";
                                     break;
                                 }
                             }
@@ -819,7 +938,7 @@ class sapp_Helper
                     {
                         if(isset($emp_depts_arr[0]) && is_array($emp_depts_arr[0]))
                         {
-                            if(!in_array(strtolower($rowData[8]),$emp_depts_arr[0]))
+                            if(!in_array(strtolower($rowData[$column_reporting_manager]),$emp_depts_arr[0]))
                             {
                                 $err_msg = "Reporting manager does not belong to management group at row ".$i.".";
                                 break;
@@ -827,36 +946,36 @@ class sapp_Helper
                         }
                     }
                     
-                    if(!empty($rowData[7]))
+                    if(!empty($rowData[$column_department]))
                     {
                         if(isset($dept_bu_arr[0]) && is_array($dept_bu_arr[0]))
                         {
-                            if(in_array(strtolower($rowData[7]),$dept_bu_arr[0]) && !empty($rowData[6]))
+                            if(in_array(strtolower($rowData[$column_department]),$dept_bu_arr[0]) && !empty($rowData[$column_business_unit]))
                             {
-                                $err_msg = "Business unit is not needed for this department '".$rowData[7]."' at row ".$i.".";
+                                $err_msg = "Business unit is not needed for this department '".$rowData[$column_department]."' at row ".$i.".";
                                 break;
                             }
-                            if(!in_array(strtolower($rowData[7]),$dept_bu_arr[0]) && empty($rowData[6]))
+                            if(!in_array(strtolower($rowData[$column_department]),$dept_bu_arr[0]) && empty($rowData[$column_business_unit]))
                             {
                                 $err_msg = "Business unit cannot be empty at row ".$i.".";
                                 break;
                             }
                         }
-                        if(!empty($rowData[6]))
+                        if(!empty($rowData[$column_business_unit]))
                         {
-                            if(isset($dept_bu_arr[$bu_arr[strtolower($rowData[6])]]) && !in_array(strtolower($rowData[7]),$dept_bu_arr[$bu_arr[strtolower($rowData[6])]])  && !empty($rowData[6]))
+                            if(isset($dept_bu_arr[$bu_arr[strtolower($rowData[$column_business_unit])]]) && !in_array(strtolower($rowData[$column_department]),$dept_bu_arr[$bu_arr[strtolower($rowData[$column_business_unit])]])  && !empty($rowData[$column_business_unit]))
                             {
-                                $err_msg = "Department does not belong to '".$rowData[6]."' business unit at row ".$i.".";
+                                $err_msg = "Department does not belong to '".$rowData[$column_business_unit]."' business unit at row ".$i.".";
                                 break;
                             }
                         }
                         
                     }
-                    if(!empty($rowData[9]) && !empty($rowData[10]))
+                    if(!empty($rowData[$column_job_title]) && !empty($rowData[$column_position]))
                     {
-                        if(isset($pos_jt_arr[$job_arr[strtolower($rowData[9])]]) && !in_array(strtolower($rowData[10]),$pos_jt_arr[$job_arr[strtolower($rowData[9])]])  && !empty($rowData[9]))
+                        if(isset($pos_jt_arr[$job_arr[strtolower($rowData[$column_job_title])]]) && !in_array(strtolower($rowData[$column_position]),$pos_jt_arr[$job_arr[strtolower($rowData[$column_job_title])]])  && !empty($rowData[$column_job_title]))
                         {
-                            $err_msg = "Position does not belong to '".$rowData[9]."' job title at row ".$i.".";
+                            $err_msg = "Position does not belong to '".$rowData[$column_job_title]."' job title at row ".$i.".";
                             break;
                         }
                     }
@@ -878,15 +997,25 @@ class sapp_Helper
                         $rowData[$rkey] = trim($rvalue);
                     }
                     
-                    $ex_prefix_arr[] = $rowData[0]; 
-                    $ex_firstname_arr[] = $rowData[1];$ex_lastname_arr[] = $rowData[2];
+                    $ex_prefix_arr[] = $rowData[$column_prefix];
+                    $ex_firstname_arr[] = $rowData[$column_first_name];
+                    $ex_lastname_arr[] = $rowData[$column_last_name];
+                    $ex_username_arr[] = $rowData[$column_username];
                     $ex_emp_id_arr[] = $employeeId_final;
-                    $ex_role_arr[] = $rowData[4];
-                    $ex_email_arr[$i] = $rowData[5]; $ex_bu_arr[] = $rowData[6]; $ex_dep_arr[] = $rowData[7];
-                    $ex_rm_arr[] = $rowData[8]; $ex_jt_arr[] = $rowData[9]; $ex_pos_arr[] = $rowData[10];
-                    $ex_es_arr[] = $rowData[11]; $ex_doj_arr[] = $rowData[12]; $ex_dol_arr[] = $rowData[13];
-                    $ex_exp_arr[] = $rowData[14];    $ex_ext_arr[] = $rowData[15];    $ex_wn_arr[] = $rowData[16];
-                    $ex_fax_arr[] = $rowData[17];
+                    $ex_role_arr[] = $rowData[$column_role_type];
+                    $ex_email_arr[$i] = $rowData[$column_email];
+                    $ex_bu_arr[] = $rowData[$column_business_unit];
+                    $ex_dep_arr[] = $rowData[$column_department];
+                    $ex_rm_arr[] = $rowData[$column_reporting_manager];
+                    $ex_jt_arr[] = $rowData[$column_job_title];
+                    $ex_pos_arr[] = $rowData[$column_position];
+                    $ex_es_arr[] = $rowData[$column_employment_status];
+                    $ex_doj_arr[] = $rowData[$column_date_of_joining];
+                    $ex_dol_arr[] = $rowData[$column_date_of_leaving];
+                    $ex_exp_arr[] = $rowData[$column_experience];
+                    $ex_ext_arr[] = $rowData[$column_extension];
+                    $ex_wn_arr[] = $rowData[$column_work_telephone_number];
+                    $ex_fax_arr[] = $rowData[$column_fax];
                     $tot_rec_cnt++;
                 }
                 
@@ -918,33 +1047,34 @@ class sapp_Helper
                     {
                         // $emp_id = $emp_identity_code.str_pad($usersModel->getMaxEmpId($emp_identity_code), 4, '0', STR_PAD_LEFT);
                         $rowData_org = $sheet->rangeToArray('A' . $i . ':' . $highestColumn . $i, NULL, TRUE, TRUE);
-                        $rowData = $rowData_org[0];
+                        $rowData = $rowData_org[$column_prefix];
                         $rowData_cpy = $rowData;
                         foreach($rowData_cpy as $rkey => $rvalue)
                         {
                             $rowData[$rkey] = trim($rvalue);
                         }
-                        $employeeId_final = trim($emp_identity_code).trim($rowData[3]);
+                        $employeeId_final = trim($emp_identity_code).trim($rowData[$column_employee_id]);
                         $emppassword = sapp_Global::generatePassword();
 
-                        $date_join = str_replace('/', '-', $rowData[12]);
+                        $date_join = str_replace('/', '-', $rowData[$column_date_of_joining]);
                         $date_of_joining = date('Y-m-d', strtotime($date_join));
 
                         $date_of_leaving = "";
-                        if($rowData[13] != '')
+                        if($rowData[$column_date_of_leaving] != '')
                         {
-                            $date_leave = str_replace('/', '-', $rowData[13]);
+                            $date_leave = str_replace('/', '-', $rowData[$column_date_of_leaving]);
                             $date_of_leaving= date('Y-m-d', strtotime($date_leave));
                         }
                         //start of saving into user table
-                        $userfullname = $rowData[1].' '.$rowData[2];
+                        $userfullname = $rowData[$column_first_name].' '.$rowData[$column_last_name];
                         $user_data = array(
-                            'emprole' =>$roles_arr[strtolower($rowData[4])],
+                            'emprole' =>$roles_arr[strtolower($rowData[$column_role_type])],
                             'userfullname' => $userfullname,
-                            'firstname' => $rowData[1],
-                            'lastname' => $rowData[2],
-                            'emailaddress' => $rowData[5],
-                            'jobtitle_id'=> isset($job_arr[strtolower($rowData[9])])?$job_arr[strtolower($rowData[9])]:null,
+                            'firstname' => $rowData[$column_first_name],
+                            'lastname' => $rowData[$column_last_name],
+                            'username' => $rowData[$column_username],
+                            'emailaddress' => $rowData[$column_email],
+                            'jobtitle_id'=> isset($job_arr[strtolower($rowData[$column_job_title])])?$job_arr[strtolower($rowData[$column_job_title])]:null,
                             'modifiedby'=> $loginUserId,
                             'modifieddate'=> gmdate("Y-m-d H:i:s"),
                             'emppassword' => md5($emppassword),
@@ -962,19 +1092,19 @@ class sapp_Helper
                         //start of saving into employee table
                         $data = array(  
                             'user_id'=>$user_id,
-                            'reporting_manager'=>$users_arr[strtolower($rowData[8])],
+                            'reporting_manager'=>$users_arr[strtolower($rowData[$column_reporting_manager])],
                             'emp_status_id'=>$emp_stat_arr[strtolower($rowData[11])],
-                            'businessunit_id'=>(!empty($rowData[5]))?$bu_arr[strtolower($rowData[6])]:0,
-                            'department_id'=>(!empty($rowData[6]))?$dep_arr[strtolower($rowData[7])]:null,
-                            'jobtitle_id'=>isset($job_arr[strtolower($rowData[9])])?$job_arr[strtolower($rowData[9])]:null, 
-                            'position_id'=>isset($positions_arr[strtolower($rowData[10])])?$positions_arr[strtolower($rowData[10])]:null, 
-                            'prefix_id'=> isset($prefix_arr[strtolower($rowData[0])])?$prefix_arr[strtolower($rowData[0])]:null,
-                            'extension_number'=>($rowData[15]!=''?$rowData[15]:NULL),
-                            'office_number'=>($rowData[16]!=''?$rowData[16]:NULL),
-                            'office_faxnumber'=>($rowData[17]!=''?$rowData[17]:NULL),
+                            'businessunit_id'=>(!empty($rowData[$column_business_unit]))?$bu_arr[strtolower($rowData[$column_department])]:0,
+                            'department_id'=>(!empty($rowData[$column_department]))?$dep_arr[strtolower($rowData[$column_department])]:null,
+                            'jobtitle_id'=>isset($job_arr[strtolower($rowData[$column_job_title])])?$job_arr[strtolower($rowData[$column_job_title])]:null,
+                            'position_id'=>isset($positions_arr[strtolower($rowData[$column_position])])?$positions_arr[strtolower($rowData[$column_position])]:null,
+                            'prefix_id'=> isset($prefix_arr[strtolower($rowData[$column_prefix])])?$prefix_arr[strtolower($rowData[$column_prefix])]:null,
+                            'extension_number'=>($rowData[$column_extension]!=''?$rowData[$column_extension]:NULL),
+                            'office_number'=>($rowData[$column_work_telephone_number]!=''?$rowData[$column_work_telephone_number]:NULL),
+                            'office_faxnumber'=>($rowData[$column_fax]!=''?$rowData[$column_fax]:NULL),
                             'date_of_joining'=>$date_of_joining,
                             'date_of_leaving'=>($date_of_leaving!=''?$date_of_leaving:NULL),
-                            'years_exp'=>($rowData[14]=='')?null:$rowData[14],
+                            'years_exp'=>($rowData[$column_experience]=='')?null:$rowData[$column_experience],
                             'modifiedby'=>$loginUserId,				
                             'modifieddate'=>gmdate("Y-m-d H:i:s")
                         );
@@ -1001,6 +1131,21 @@ class sapp_Helper
                             $salary_model = new Default_Model_Empsalarydetails();
                             $salary_model->SaveorUpdateEmpSalaryData($salary_data,'');
                         }
+                        if ($rowData[$column_work_country] != '' || $rowData[$column_work_street] != '' ||
+                        $rowData[$column_work_state] != '' || $rowData[$column_work_city] != '' ||
+                        $rowData[$column_work_pincode] != '')
+                        {
+                            $work_data = array(
+                                'work_country' => isset($countries_arr[strtolower($rowData[$column_work_country])])?$countries_arr[strtolower($rowData[$column_work_country])]:null,
+                                'work_state' => isset($states_arr[strtolower($rowData[$column_work_state])])?$states_arr[strtolower($rowData[$column_work_state])]:null,
+                                'work_city' => isset($cities_arr[strtolower($rowData[$column_work_city])])?$cities_arr[strtolower($rowData[$column_work_city])]:null,
+                                'work_street' => isset($rowData[$column_work_street])?$rowData[$column_work_street]:null,
+                                'work_pincode' => isset($rowData[$column_work_pincode])?$rowData[$column_work_pincode]:null,
+                            );
+                            $empcom_model = new Default_Model_Empcommunicationdetails();
+                            $empcom_model->SaveorUpdateEmpcommData($work_data, '');
+                        }
+
                         //end of saving into salary details
                         //start of mail
                         $text = "<div style='padding: 0; text-align: left; font-size:14px; font-family:Arial, Helvetica, sans-serif;'>				
@@ -1009,7 +1154,7 @@ class sapp_Helper
                                         <div style='padding:20px 0 0 0;color:#3b3b3b;'>You have been added to ". APPLICATION_NAME.". The login credentials for your Sentrifugo account are:</div>
 
                                         <div style='padding:20px 0 0 0;color:#3b3b3b;'>Username: <strong>".$employeeId_final."</strong></div>
-                                        <div style='padding:5px 0 0 0;color:#3b3b3b;'>Password: <strong>".$emppassword."</strong></div>
+                                        <div style='padding:5px 0 0 0;color:#3b3b3b;'>Password: <strong>".(LDAP_ENABLED == 'true' ? 'Your AD password' : $emppassword)."</strong></div>
 
                                         <div style='padding:20px 0 10px 0;'>Please <a href='".BASE_URL."index/popup' target='_blank' style='color:#b3512f;'>click here</a> to login  to your Sentrifugo account.</div>
 

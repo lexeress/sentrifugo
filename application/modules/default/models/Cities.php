@@ -215,6 +215,26 @@ class Default_Model_Cities extends Zend_Db_Table_Abstract
 		return $this->fetchAll($select)->toArray();
 	
 	}
+
+	public function getActiveCitiesList_excel()
+    {
+        $db = Zend_Db_Table::getDefaultAdapter();
+        $parray = array();
+        $query = "select countryid, state, city, city_org_id from main_cities where isactive = 1";
+        $res = $db->query($query)->fetchAll();
+        if(!empty($res))
+        {
+            foreach($res as $row)
+            {
+                $parray[strtolower($row['city'])] = array(
+                    'countryid' => $row['countryid'],
+                    'state' => $row['state'],
+                    'city_org_id' => $row['city_org_id']
+                );
+            }
+        }
+        return $parray;
+    }
 	
 	public function getBasicCitiesList($stateid)
 	{

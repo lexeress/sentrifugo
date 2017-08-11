@@ -223,6 +223,25 @@ class Default_Model_Countries extends Zend_Db_Table_Abstract
 		return $this->fetchAll($select)->toArray();
 	
 	}
+
+	public function getActiveCountries_excel()
+    {
+        $db = Zend_Db_Table::getDefaultAdapter();
+        $parray = array();
+        $query = "select country,country_id_org,countrycode from main_countries where isactive = 1";
+        $res = $db->query($query)->fetchAll();
+        if(!empty($res))
+        {
+            foreach($res as $row)
+            {
+                $parray[strtolower($row['country'])] = array(
+                    'country_id_org' => $row['country_id_org'],
+                    'countrycode' => $row['countrycode']
+                );
+            }
+        }
+        return $parray;
+    }
 	
 	public function UpdateMainCountryData($id)
 	{
