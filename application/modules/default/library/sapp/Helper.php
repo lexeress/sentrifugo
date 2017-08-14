@@ -848,8 +848,8 @@ class sapp_Helper
                     }
                     if (!array_key_exists(strtolower($rowData[$column_username]), $emp_username_arr) && !empty($rowData[$column_username]))
                     {
-                        $err_msg = "Username already exists at row ".$i.".";
-                        
+                        //$err_msg = "Username already exists at row ".$i.".";
+                        //break;
                     }
                     if(!array_key_exists(strtolower($rowData[$column_role_type]), $roles_arr)  && !empty($rowData[$column_role_type]))
                     {
@@ -1135,10 +1135,22 @@ class sapp_Helper
                         $rowData[$column_work_state] != '' || $rowData[$column_work_city] != '' ||
                         $rowData[$column_work_pincode] != '')
                         {
+                            $work_country_id = isset($countries_arr[strtolower($rowData[$column_work_country])])?
+                                $countries_arr[strtolower($rowData[$column_work_country])]['country_id_org'] :
+                                null;
+
+                            $work_state_id = isset($states_arr[strtolower($rowData[$column_work_state])])?
+                                $states_arr[strtolower($rowData[$column_work_state])]['state_id_org'] :
+                                null;
+
+                            $work_city_id = isset($cities_arr[strtolower($rowData[$column_work_city])])?
+                                $cities_arr[strtolower($rowData[$column_work_city])]['city_org_id'] :
+                                null;
+
                             $work_data = array(
-                                'work_country' => isset($countries_arr[strtolower($rowData[$column_work_country])])?$countries_arr[strtolower($rowData[$column_work_country])]:null,
-                                'work_state' => isset($states_arr[strtolower($rowData[$column_work_state])])?$states_arr[strtolower($rowData[$column_work_state])]:null,
-                                'work_city' => isset($cities_arr[strtolower($rowData[$column_work_city])])?$cities_arr[strtolower($rowData[$column_work_city])]:null,
+                                'work_country' => $work_country_id,
+                                'work_state' => $work_state_id,
+                                'work_city' => $work_city_id,
                                 'work_street' => isset($rowData[$column_work_street])?$rowData[$column_work_street]:null,
                                 'work_pincode' => isset($rowData[$column_work_pincode])?$rowData[$column_work_pincode]:null,
                             );
