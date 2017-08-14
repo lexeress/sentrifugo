@@ -1148,6 +1148,7 @@ class sapp_Helper
                                 null;
 
                             $work_data = array(
+                                'user_id' => $user_id,
                                 'work_country' => $work_country_id,
                                 'work_state' => $work_state_id,
                                 'work_city' => $work_city_id,
