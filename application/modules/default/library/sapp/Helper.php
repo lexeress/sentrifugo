@@ -1152,7 +1152,7 @@ class sapp_Helper
                                 'work_country' => $work_country_id,
                                 'work_state' => $work_state_id,
                                 'work_city' => $work_city_id,
-                                'work_street' => isset($rowData[$column_work_street])?$rowData[$column_work_street]:null,
+                                'work_streetaddress' => isset($rowData[$column_work_street])?$rowData[$column_work_street]:null,
                                 'work_pincode' => isset($rowData[$column_work_pincode])?$rowData[$column_work_pincode]:null,
                             );
                             $empcom_model = new Default_Model_Empcommunicationdetails();
