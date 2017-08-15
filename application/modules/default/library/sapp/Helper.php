@@ -724,7 +724,7 @@ class sapp_Helper
                         $err_msg = "Job title is not a valid format at row ".$i.".";
                         break;
                     }
-                    if(!preg_match("/^[a-zA-Z][a-zA-Z0-9\-\s]*$/i", $rowData[$column_position])  && !empty($rowData[$column_position]))
+                    if(!preg_match("/^[a-zA-Z][a-zA-Z0-9\-\s\&]*$/i", $rowData[$column_position])  && !empty($rowData[$column_position]))
                     {
                         $err_msg = "Position is not a valid format at row ".$i.".";
                         break;
