@@ -816,7 +816,7 @@ class sapp_Helper
                         $err_msg = $arrReqHeaders[$column_work_country]." is not a valid format at row ".$i.".";
                         break;
                     }
-                    if(!preg_match("/^[a-zA-Z]+$/", $rowData[$column_work_state])  && !empty($rowData[$column_work_state]))
+                    if(!preg_match("/^[a-zA-Z\-]+$/", $rowData[$column_work_state])  && !empty($rowData[$column_work_state]))
                     {
                         $err_msg = $arrReqHeaders[$column_work_state]." is not a valid format at row ".$i.".";
                         break;
