@@ -1094,7 +1094,7 @@ class sapp_Helper
                             'user_id'=>$user_id,
                             'reporting_manager'=>$users_arr[strtolower($rowData[$column_reporting_manager])],
                             'emp_status_id'=>$emp_stat_arr[strtolower($rowData[11])],
-                            'businessunit_id'=>(!empty($rowData[$column_business_unit]))?$bu_arr[strtolower($rowData[$column_department])]:0,
+                            'businessunit_id'=>(!empty($rowData[$column_business_unit]))?$bu_arr[strtolower($rowData[$column_business_unit])]:0,
                             'department_id'=>(!empty($rowData[$column_department]))?$dep_arr[strtolower($rowData[$column_department])]:null,
                             'jobtitle_id'=>isset($job_arr[strtolower($rowData[$column_job_title])])?$job_arr[strtolower($rowData[$column_job_title])]:null,
                             'position_id'=>isset($positions_arr[strtolower($rowData[$column_position])])?$positions_arr[strtolower($rowData[$column_position])]:null,
