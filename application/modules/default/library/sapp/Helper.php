@@ -811,7 +811,7 @@ class sapp_Helper
                         $err_msg = $arrReqHeaders[$column_salary]." cannot be zero at row ".$i.".";
                         break;
                     }
-                    if(!preg_match("/^[a-zA-Z]+$/", $rowData[$column_work_country])  && !empty($rowData[$column_work_country]))
+                    if(!preg_match("/^[a-zA-Z\ ]+$/", $rowData[$column_work_country])  && !empty($rowData[$column_work_country]))
                     {
                         $err_msg = $arrReqHeaders[$column_work_country]." is not a valid format at row ".$i.".";
                         break;
